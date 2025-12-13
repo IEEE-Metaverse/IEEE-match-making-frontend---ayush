@@ -106,18 +106,27 @@ export default function ChatWindow({ activeUser, messages = [], currentUser, onS
         // Listen for blocked messages from backend
         const handleMessageBlocked = ({ reason, content }) => {
             console.warn("🚫 Message blocked in ChatWindow", { reason, content });
-            setModerationWarning({ 
+            const warningData = { 
                 reason: reason || "This message violates community guidelines.",
                 content: content || ""
-            });
+            };
+            console.log("🚫 Setting moderation warning state:", warningData);
+            setModerationWarning(warningData);
+            
+            // Force re-render by logging state
+            setTimeout(() => {
+                console.log("🚫 Current moderationWarning state:", moderationWarning);
+            }, 100);
+            
             // Auto-hide warning after 10 seconds
             setTimeout(() => {
+                console.log("🚫 Auto-hiding moderation warning");
                 setModerationWarning(null);
             }, 10000);
         };
         
         socket.on("message_blocked", handleMessageBlocked);
-        console.log("✅ ChatWindow: message_blocked listener registered");
+        console.log("✅ ChatWindow: message_blocked listener registered on socket:", socket.id);
 
         // Cleanup on unmount
         return () => {
